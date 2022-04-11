@@ -1,11 +1,14 @@
 import { useCounter } from '../core/context';
 
-export type HooksComponentStateSetters = {
+export type HooksComponentState = {
+  [counter: number]: any;
+};
+export type HooksComponentStateSetter = {
   [counter: number]: SetState<any>;
 };
 
 type State<T> = T | (() => T);
-export type SetState<T> = (state: T | ((prevState: T) => T)) => void;
+type SetState<T> = (state: T | ((prevState: T) => T)) => void;
 
 export function useState<T>(initialState: State<T>): [T, SetState<T>] {
   const { component, counter } = useCounter();
