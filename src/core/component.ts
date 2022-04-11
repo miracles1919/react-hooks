@@ -1,19 +1,19 @@
 import { Component } from 'react';
-import type { SetState } from '../hooks/useState';
+import {
+  HooksComponentState,
+  HooksComponentStateSetter,
+  HooksComponentEffects,
+  runEffects,
+  cleanupEffects,
+} from '../hooks';
 import { withContext } from './context';
-
-type HooksComponentState = {
-  [counter: number]: any;
-};
-type HooksComponentStateSetter = {
-  [counter: number]: SetState<any>;
-};
 
 export interface HooksComponent<P = {}>
   extends Component<P, HooksComponentState> {
   state: HooksComponentState;
   __hooks__: {
     setter: HooksComponentStateSetter;
+    effects: HooksComponentEffects;
   };
 }
 
@@ -33,6 +33,7 @@ export function withHooks<P extends {} = {}>(component: Render<P>) {
     public state: HooksComponentState = {};
     public __hooks__: HooksComponent['__hooks__'] = {
       setter: {},
+      effects: {},
     };
 
     constructor(props: P) {
@@ -42,15 +43,17 @@ export function withHooks<P extends {} = {}>(component: Render<P>) {
 
     componentDidMount() {
       console.log('did mount');
+      runEffects(this.__hooks__.effects);
     }
 
     componentDidUpdate() {
       console.log('did update');
+      runEffects(this.__hooks__.effects);
     }
 
-    // this.__hooks__ = {
-
-    // }
+    componentWillMount() {
+      cleanupEffects(this.__hooks__.effects);
+    }
   };
 
   return HooksWrap;
